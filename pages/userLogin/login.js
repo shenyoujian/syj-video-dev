@@ -1,21 +1,19 @@
 const app = getApp()
 
 Page({
-  data: {
+  data: {},
 
-  },
-
-  //这个e就是form对象，我们可以通过e获取username和password
-  doRegist: function(e) {
+  //登录，这个e就是form对象，我们可以通过e获取username和password
+  doLogin: function(e) {
     var formObject = e.detail.value;
     var username = formObject.username;
     var password = formObject.password;
 
-    //简单非空验证
-    if (username.length == 0 || password.length == 0) {
+    //非空判断
+    if (username == null || password == null) {
       //相当于弹窗的一个api，3秒后消失
       wx.showToast({
-        title: '用户名或密码不能为空',
+        title: '用户名和密码不能为空！',
         icon: 'none',
         duration: 3000
       })
@@ -26,7 +24,7 @@ Page({
         title: '请等待....',
       })
       wx.request({
-        url: serverUrl + '/regist',
+        url: serverUrl + '/login',
         method: 'POST',
         data: {
           username: username,
@@ -38,19 +36,22 @@ Page({
         //当调用成功会有个回调函数,res是后端发回的数据，主要是判断状态码
         success: function(res) {
           console.log(res.data);
-          //请求成功，隐藏加载
+          //当成功后隐藏加载
           wx.hideLoading();
           //判断状态码
           var status = res.data.status;
           if (status == 200) {
             wx.showToast({
-              title: "用户注册成功~",
-              icon: 'none',
-              duration: 3000
+              title: "登录成功~",
+              icon: 'success',
+              duration: 2000
             })
             //设置全局对象，类似于cookie
             app.userInfo = res.data.data;
+            //页面跳转
+
           } else if (status == 500) {
+            //失败弹出框
             wx.showToast({
               title: res.data.msg,
               icon: 'none',
@@ -61,13 +62,12 @@ Page({
       })
 
     }
-
   },
 
-  //保留当前页面，返回登录页面
-  goLoginPage: function(){
-    wx.navigateTo({
-      url: '../userLogin/login',
+  //关闭当前页面，跳转到注册页面
+  goRegistPage: function() {
+    wx.redirectTo({
+      url: '../userRegist/regist',
     })
   }
 })
