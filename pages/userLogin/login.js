@@ -48,8 +48,10 @@ Page({
             })
             //设置全局对象，类似于cookie
             app.userInfo = res.data.data;
-            //页面跳转
-
+            //登录成功，跳转到个人页面
+            wx.redirectTo({
+              url: '../mine/mine',
+            })
           } else if (status == 500) {
             //失败弹出框
             wx.showToast({
