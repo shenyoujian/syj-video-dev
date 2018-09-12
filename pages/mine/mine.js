@@ -9,7 +9,7 @@ Page({
       logout: function() {
         //首先获取全局的userinfo和服务端地址
         var user = app.userInfo;
-        var serverUrl = app
+        var serverUrl = app.serverUrl;
         wx.showLoading({
           title: '请等待...',
         })
@@ -148,8 +148,6 @@ Page({
                 followCounts: userInfo.followCounts,
                 receiveLikeCounts: userInfo.receiveLikeCounts,
                 nickname: userInfo.nickname,
-                isFollow: userInfo.follow
-
               });
 
 
@@ -160,21 +158,22 @@ Page({
       },
 
 
-      //上传视频
+      //上传视频，先上传到微信的临时路径
       uploadVideo:function(){
         var me = this;
         wx.chooseVideo({
           sourceType: ['album'],
           success: function (res) {
             console.log(res);
+            // 获取你上传视频的信息
+            var duration = res.duration;   //选定视频的时间长度
+            var tmpHeight = res.height;    //返回选定视频的长
+            var tmpWidth = res.width;      //返回选定视频的宽
+            var tmpVideoUrl = res.tempFilePath;   //选定视频的临时文件路径
+            var tmpCoverUrl = res.thumbTempFilePath;  //图片资源路径
 
-            var duration = res.duration;
-            var tmpHeight = res.height;
-            var tmpWidth = res.width;
-            var tmpVideoUrl = res.tempFilePath;
-            var tmpCoverUrl = res.thumbTempFilePath;
-
-            if (duration > 11) {
+            //接着简单判断
+            if (duration > 10) {
               wx.showToast({
                 title: '视频长度不能超过10秒...',
                 icon: "none",
@@ -187,7 +186,7 @@ Page({
                 duration: 2500
               })
             } else {
-              // 打开选择bgm的页面
+              // 判断成功后，打开选择bgm的页面,并且把该页面上传的视频参数给带过去，记得&拼接
               wx.navigateTo({
                 url: '../chooseBgm/chooseBgm?duration=' + duration
                   + "&tmpHeight=" + tmpHeight

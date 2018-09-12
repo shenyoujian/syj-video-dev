@@ -1,28 +1,13 @@
 <view>
   <form bindsubmit='upload'>
-
-    <radio-group>
-      <view class='container'>
-        <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
-        <radio style='margin-top:20px;' value=''></radio>
-      </view>
-
-      <view class='container'>
-        <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
-        <radio style='margin-top:20px;' value=''></radio>
-      </view>
-      <view class='container'>
-        <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
-        <radio style='margin-top:20px;' value=''></radio>
-      </view>
-      <view class='container'>
-        <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
-        <radio style='margin-top:20px;' value=''></radio>
-      </view>
-      <view class='container'>
-        <audio poster="{{poster}}" name="{{name}}" author="{{author}}" src="{{src}}" id="myAudio" controls loop></audio>
-        <radio style='margin-top:20px;' value=''></radio>
-      </view>
+  <!--需要写name属性，这样js方法里的e才能获取到-->
+    <radio-group name="bgmId">
+      <block wx:for="{{bgmList}}">
+        <view class='container'>
+          <audio name="{{item.name}}" author="{{item.author}}" src="{{serverUrl}}{{item.path}}" style='width:300px' id="myAudio" controls loop></audio>
+          <radio style='margin-top:20px;' value='{{item.id}}'></radio>
+        </view>
+      </block>
     </radio-group>
     <view class="inputView">
       <label class="loginLabel">视频描述：</label>
