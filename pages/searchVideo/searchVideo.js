@@ -10,13 +10,13 @@ Page({
   onLoad: function () {
 
     // 2 搜索栏初始化
-    var that = this;
+    var me = this;
     WxSearch.init(
-      that,  // 本页面一个引用
+      me,  // 本页面一个引用
       ['java', 'python', "php"], // 热点搜索推荐，[]表示不使用
       [],// 搜索匹配，[]表示不使用
-      that.mySearchFunction, // 提供一个搜索回调函数
-      that.myGobackFunction //提供一个返回回调函数
+      me.mySearchFunction, // 提供一个搜索回调函数
+      me.myGobackFunction //提供一个返回回调函数
     );
 
   },

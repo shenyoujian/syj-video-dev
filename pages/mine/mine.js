@@ -8,7 +8,9 @@ Page({
 
       logout: function() {
         //首先获取全局的userinfo和服务端地址
-        var user = app.userInfo;
+        //var user = app.userInfo;
+        //fixme使用本地缓存替换全局变量
+        var user = app.getGlobalUserInfo();
         var serverUrl = app.serverUrl;
         wx.showLoading({
           title: '请等待...',
@@ -33,7 +35,8 @@ Page({
                 duration: 2000
               })
               //注销之后，清空缓存
-              app.userInfo = null;
+              //app.userInfo = null;
+              wx.removeStorageSync("userInfo");
               //跳转到登录页面
               wx.redirectTo({
                 url: '../userLogin/login',
@@ -50,6 +53,8 @@ Page({
 
         //在回调函数中不能使用this当前对象去获取初始化数据，因为在success回调函数当前对象中已经改变，这里先保存到一个变量中以供回调函数使用
         var me = this;
+        //fixme使用本地缓存修改全局变量
+        var userInfo = app.getGlobalUserInfo();
 
         //选择本地照片
         wx.chooseImage({
@@ -68,7 +73,7 @@ Page({
             var serverUrl = app.serverUrl;
 
             wx.uploadFile({
-              url: serverUrl + "/user/uploadFace?userId=" + app.userInfo.id, //仅为示例，非真实的接口地址
+              url: serverUrl + "/user/uploadFace?userId=" + userInfo.id, //仅为示例，非真实的接口地址
               filePath: tempFilePaths[0],
               name: 'file',
               header: {
@@ -114,7 +119,9 @@ Page({
       onLoad: function() {
         //回调函数里的当前对象已经改变，需要提前保存在变量里
         var me = this;
-        var user = app.userInfo;
+        //fixme使用本地缓存修改全局变量
+        var user = app.getGlobalUserInfo();
+       //var user = app.userInfo;
         var serverUrl = app.serverUrl;
 
         wx.showLoading({

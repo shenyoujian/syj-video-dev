@@ -49,7 +49,9 @@ Page({
               duration: 3000
             })
             //设置全局对象，类似于cookie
-            app.userInfo = res.data.data;
+            //app.userInfo = res.data.data;
+            //fixme 修改原有的全局变量改为本地缓存
+            app.setGlobalUserInfo(res.data.data);
             //注册成功，跳转到个人页面
             wx.redirectTo({
               url: '../mine/mine',

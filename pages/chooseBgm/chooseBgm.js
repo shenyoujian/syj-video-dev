@@ -22,7 +22,7 @@ Page({
       title: '请等待...',
     });
     var serverUrl = app.serverUrl;
-    var user = app.userInfo;
+    // var user = app.userInfo;
     // 调用后端
     wx.request({
       url: serverUrl + '/bgm/list',
@@ -65,13 +65,17 @@ Page({
 
     //开始请求服务端上传视频
     var serverUrl = app.serverUrl;
+    //使用本地缓存替换全局变量
+    var userInfo = app.getGlobalUserInfo();
 
     wx.uploadFile({
       //之前是使用query所以需要在url后面加?参数，这样在网络传输不好，而且desc还有中文，可以使用formdata把这些参数封装进去
       //url: serverUrl + "/video/upload?userId=" + app.userInfo.id, 
       url: serverUrl + "/video/upload",
       formData: {
-        userId: app.userInfo.id,
+        //fixme
+        //userId: app.userInfo.id,
+        userId:userInfo.id,
         bgmId: bgmId,
         videoSeconds: duration,
         videoHeight: tmpHeight,
