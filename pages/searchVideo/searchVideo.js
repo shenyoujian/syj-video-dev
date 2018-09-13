@@ -11,13 +11,29 @@ Page({
 
     // 2 搜索栏初始化
     var me = this;
-    WxSearch.init(
-      me,  // 本页面一个引用
-      ['java', 'python', "php"], // 热点搜索推荐，[]表示不使用
-      [],// 搜索匹配，[]表示不使用
-      me.mySearchFunction, // 提供一个搜索回调函数
-      me.myGobackFunction //提供一个返回回调函数
-    );
+
+
+    // 查询热搜词
+    var serverUrl = app.serverUrl;
+    wx.request({
+      url: serverUrl + '/video/hot',
+      method: 'POST',
+      success:function(res){
+        console.log(res);
+        var hotList = res.data.data;
+
+
+
+        WxSearch.init(
+          me,  // 本页面一个引用
+          hotList,// ['java', 'python', "php"], // 热点搜索推荐，[]表示不使用
+          hotList,// 搜索匹配，[]表示不使用,这个是当你搜索j的时候会把java显示出来
+          me.mySearchFunction, // 提供一个搜索回调函数
+          me.myGobackFunction //提供一个返回回调函数
+        );
+      }
+    })
+   
 
   },
 
@@ -31,9 +47,9 @@ Page({
   // 4 搜索回调函数  
   mySearchFunction: function (value) {
     // do your job here
-    // 示例：跳转
+    // 示例：跳转到首页并且把查询的参数带过去会带到index的onload的param
     wx.redirectTo({
-      url: '../index/index?searchValue=' + value
+      url: '../index/index?isSaveRecord=1&search=' + value
     })
   },
 
@@ -42,7 +58,7 @@ Page({
     // do your job here
     // 示例：返回
     wx.redirectTo({
-      url: '../index/index?searchValue=返回'
+      url: '../index/index'
     })
   }
 
