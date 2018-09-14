@@ -37,7 +37,7 @@ Page({
 
 
   //提取公共方法，获取视频列表的方法
-  getAllVideoList: function (page, isSaveRecord) {
+  getAllVideoList: function(page, isSaveRecord) {
     var me = this;
     var serverUrl = app.serverUrl;
     //从页面对象里获取
@@ -102,7 +102,7 @@ Page({
     var page = currentPage + 1;
 
     //上拉刷新不需要热搜词
-    me.getAllVideoList(page,0);
+    me.getAllVideoList(page, 0);
   },
 
   //下拉刷新
@@ -111,8 +111,24 @@ Page({
     wx.showNavigationBarLoading();
 
     //每次下拉刷新都去找第一页，并且不需要热搜词
-    this.getAllVideoList(1,0);
-  }
+    this.getAllVideoList(1, 0);
+  },
+
+
+  //首页跳转到视频播放页，并且传递参数过去
+  showVideoInfo: function(e) {
+    var me = this;
+    //思路就是从e里获取用户所点击的下标，然后根据下标去获取某个视频
+    var videoList = me.data.videoList;
+    console.log(videoList);
+    var arrindex = e.target.dataset.arrindex;
+    //json对象需要转换为字符串后才能传递
+    var videoInfo = JSON.stringify(videoList[arrindex]);
+    console.log(videoInfo);
+    wx.redirectTo({
+      url: '../videoInfo/videoInfo?videoInfo=' + videoInfo,
+    })
+  },
 
 
 })
