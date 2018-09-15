@@ -1,10 +1,22 @@
 const app = getApp()
 
 Page({
-  data: {},
+  data: {
+  },
+
+  onLoad: function(params) {
+    var me = this;
+    //获取需要重定向的url
+    debugger;
+    var redirectUrl = params.redirectUrl;
+    redirectUrl = redirectUrl.replace(/#/g, "?");
+    redirectUrl = redirectUrl.replace(/@/g, "=");
+    me.redirectUrl = redirectUrl;
+  },
 
   //登录，这个e就是form对象，我们可以通过e获取username和password
   doLogin: function(e) {
+    var me = this;
     var formObject = e.detail.value;
     var username = formObject.username;
     var password = formObject.password;
@@ -50,10 +62,20 @@ Page({
             //app.userInfo = res.data.data;
             //fixme 修改原有的全局变量改为本地缓存
             app.setGlobalUserInfo(res.data.data);
-            //登录成功，跳转到个人页面
-            wx.redirectTo({
-              url: '../mine/mine',
-            })
+
+            var redirectUrl = me.redirectUrl;
+            if (redirectUrl != null && redirectUrl != '' && redirectUrl != undefined) {
+              //需要重定向
+              wx.redirectTo({
+                url: redirectUrl,
+              })
+            }else{
+              //登录成功，跳转到首页页面,不需要重定向
+              wx.redirectTo({
+                url: '../index/index',
+              })
+            }
+            
           } else if (status == 500) {
             //失败弹出框
             wx.showToast({

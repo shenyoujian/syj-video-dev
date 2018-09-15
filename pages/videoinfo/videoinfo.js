@@ -9,17 +9,17 @@ Page({
     videoInfo: {},
   },
   videoCtx: {},
-  onLoad: function(params) {
+  onLoad: function (params) {
     var me = this;
     me.videoCtx = wx.createVideoContext("myVideo", this);
     //获取上一个页面传入的参数，并且把字符串解析成json对象,因为需要
     //把视频相关的信息存入页面的data里
     var videoInfo = JSON.parse(params.videoInfo);
-    debugger;
+    // debugger;
     var videoHeight = videoInfo.videoHeight;
     var videoWidth = videoInfo.videoWidth;
-    var cover = "cover",
-    if (videoWidth > videoHeight) {
+    var cover = "cover";
+    if (videoWidth >= videoHeight) {
       cover: "";
     }
 
@@ -31,31 +31,68 @@ Page({
 
   },
 
-  onShow: function() {
+  onShow: function () {
     var me = this;
     me.videoCtx.play();
   },
 
-  onHide: function() {
+  onHide: function () {
     var me = this;
     me.videoCtx.pause();
   },
 
-  upload: function() {
-    videoUtil.uploadVideo();
+  upload: function () {
+    var me = this;
+    //页面拦截，当没登陆观看视频后点击upload上传视频的时候进行拦截
+    var user = app.getGlobalUserInfo();
+
+    //当没登录点击上传之后跳转到登录登录页面，重新登录之后会跳到
+    //首页而不是用户之前观看的视频页，所以这里使用重定向使用户登录之后跳转到之前观看的视频页
+    //重定向主要就是把需要重定向的地址传递给首页让首页去自动跳转
+    //而重定向的地址需要知道是哪个视频所以需要之前首页传递过来的videoInfo再传递过去
+    var videoInfo = JSON.stringify(me.data.videoInfo);
+    //重定向的地址
+    var realUrl = "../videoInfo/videoInfo#videoInfo@" + videoInfo;
+    
+
+    if (user == null || user == '' || user == undefined) {
+      wx.navigateTo({
+        //接着把重定向的地址传递给登录页面
+        url: '../userLogin/login?redirectUrl=' + realUrl,
+      })
+    } else {
+      videoUtil.uploadVideo();
+    }
   },
 
+
   //按住搜索跳转到搜索页面
-  showSearch: function() {
+  showSearch: function () {
     wx.navigateTo({
       url: '../searchVideo/searchVideo',
     })
   },
 
 
-  showIndex: function() {
+  showIndex: function () {
     wx.navigateTo({
       url: '../index/index',
     })
+  },
+
+  showMine: function () {
+
+    //页面拦截，当没登陆观看视频后点击showme要看个人信息的时候进行拦截
+    var user = app.getGlobalUserInfo();
+    if (user == null || user == '' || user == undefined) {
+      wx.navigateTo({
+        url: '../userLogin/login',
+      })
+    } else {
+      wx.navigateTo({
+        url: '../mine/mine',
+      })
+    }
+
   }
 })

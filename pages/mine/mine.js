@@ -123,6 +123,7 @@ Page({
         var me = this;
         //fixme使用本地缓存修改全局变量
         var user = app.getGlobalUserInfo();
+        
        //var user = app.userInfo;
         var serverUrl = app.serverUrl;
 
