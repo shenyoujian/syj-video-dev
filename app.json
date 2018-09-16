@@ -2,9 +2,13 @@
   "pages": [
     "pages/userLogin/login",
     "pages/index/index",
+    "pages/mine/mine",
+    
+    
+    
     "pages/videoInfo/videoInfo",
     
-    "pages/mine/mine",
+    
     "pages/userRegist/regist",
     "pages/chooseBgm/chooseBgm",
     "pages/searchVideo/searchVideo"

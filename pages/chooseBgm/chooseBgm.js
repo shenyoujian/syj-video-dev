@@ -38,6 +38,15 @@ Page({
             bgmList: bgmList,
             serverUrl: serverUrl
           });
+        } else if (data.status == 502) {
+          wx.showToast({
+            title: data.msg,
+            success: function () {
+              wx.redirectTo({
+                url: '../userLogin/login',
+              })
+            }
+          });
         }
       }
     })
@@ -149,6 +158,15 @@ Page({
           //     icon: 'none',
           //   });
           // }
+        } else if (data.status == 502) {
+          wx.showToast({
+            title: data.msg,
+            success: function () {
+              wx.redirectTo({
+                url: '../userLogin/login',
+              })
+            }
+          });
         }
       }
 

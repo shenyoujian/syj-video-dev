@@ -1,17 +1,17 @@
 const app = getApp()
 
 Page({
-  data: {
-  },
+  data: {},
 
   onLoad: function(params) {
     var me = this;
     //获取需要重定向的url
-    debugger;
     var redirectUrl = params.redirectUrl;
-    redirectUrl = redirectUrl.replace(/#/g, "?");
-    redirectUrl = redirectUrl.replace(/@/g, "=");
-    me.redirectUrl = redirectUrl;
+    if (redirectUrl != null && redirectUrl != '' && redirectUrl != undefined) {
+      redirectUrl = redirectUrl.replace(/#/g, "?");
+      redirectUrl = redirectUrl.replace(/@/g, "=");
+      me.redirectUrl = redirectUrl;
+    }
   },
 
   //登录，这个e就是form对象，我们可以通过e获取username和password
@@ -69,13 +69,13 @@ Page({
               wx.redirectTo({
                 url: redirectUrl,
               })
-            }else{
+            } else {
               //登录成功，跳转到首页页面,不需要重定向
               wx.redirectTo({
                 url: '../index/index',
               })
             }
-            
+
           } else if (status == 500) {
             //失败弹出框
             wx.showToast({
