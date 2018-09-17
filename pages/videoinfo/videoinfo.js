@@ -7,9 +7,11 @@ Page({
     videoId: "",
     src: "",
     videoInfo: {},
+
+    userLikeVideo: false,
   },
   videoCtx: {},
-  onLoad: function (params) {
+  onLoad: function(params) {
     var me = this;
     me.videoCtx = wx.createVideoContext("myVideo", this);
     //获取上一个页面传入的参数，并且把字符串解析成json对象,因为需要
@@ -31,17 +33,17 @@ Page({
 
   },
 
-  onShow: function () {
+  onShow: function() {
     var me = this;
     me.videoCtx.play();
   },
 
-  onHide: function () {
+  onHide: function() {
     var me = this;
     me.videoCtx.pause();
   },
 
-  upload: function () {
+  upload: function() {
     var me = this;
     //页面拦截，当没登陆观看视频后点击upload上传视频的时候进行拦截
     var user = app.getGlobalUserInfo();
@@ -53,7 +55,7 @@ Page({
     var videoInfo = JSON.stringify(me.data.videoInfo);
     //重定向的地址
     var realUrl = "../videoInfo/videoInfo#videoInfo@" + videoInfo;
-    
+
 
     if (user == null || user == '' || user == undefined) {
       wx.navigateTo({
@@ -67,20 +69,20 @@ Page({
 
 
   //按住搜索跳转到搜索页面
-  showSearch: function () {
+  showSearch: function() {
     wx.navigateTo({
       url: '../searchVideo/searchVideo',
     })
   },
 
 
-  showIndex: function () {
+  showIndex: function() {
     wx.navigateTo({
       url: '../index/index',
     })
   },
 
-  showMine: function () {
+  showMine: function() {
 
     //页面拦截，当没登陆观看视频后点击showme要看个人信息的时候进行拦截
     var user = app.getGlobalUserInfo();
@@ -93,6 +95,49 @@ Page({
         url: '../mine/mine',
       })
     }
+
+  },
+
+  //点赞与取消点赞
+  likeVideoOrNot: function() {
+    var me = this;
+    var user = app.getGlobalUserInfo();
+    debugger;
+    var userLikeVideo = me.data.userLikeVideo;
+    var videoInfo = me.data.videoInfo;
+    var serverUrl = app.serverUrl;
+    var url = '';
+    if (user == null || user == '' || user == undefined) {
+      wx.navigateTo({
+        url: '../UserLogin/login',
+      })
+    } else {
+      url = "/video/userLike?userId=" + user.id + "&videoId=" + videoInfo.id +
+        "&videoCreaterId=" + videoInfo.userId;
+      if (userLikeVideo) {
+        url = "/video/userUnLike?userId=" + user.id + "&videoId=" + videoInfo.id +
+          "&videoCreaterId=" + videoInfo.userId;
+      }
+    }
+    wx.showLoading({
+      title: '加载中...',
+    })
+    wx.request({
+      url: serverUrl + url,
+      method: 'POST',
+      header: {
+        'content-type': 'application/json', // 默认值
+        //用于验证的安全信息
+        'userId': user.id,
+        'userToken': user.userToken,
+      },
+      success: function(res) {
+        wx.hideLoading();
+        me.setData({
+          userLikeVideo: !userLikeVideo,
+        })
+      }
+    })
 
   }
 })
