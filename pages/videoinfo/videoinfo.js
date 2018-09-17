@@ -68,6 +68,25 @@ Page({
     me.videoCtx.pause();
   },
 
+  showPublisher:function(){
+    var me = this;
+
+    var user = app.getGlobalUserInfo();
+
+    var videoInfo = me.data.videoInfo;
+    //var realUrl = '../mine/mine#publisherId@' + videoInfo.userId;
+
+    if (user == null || user == undefined || user == '') {
+      wx.navigateTo({
+        url: '../userLogin/login?redirectUrl=' + realUrl,
+      })
+    } else {
+      wx.navigateTo({
+        url: '../mine/mine?publisherId=' + videoInfo.userId,
+      })
+    }
+  },
+
   upload: function() {
     var me = this;
     //页面拦截，当没登陆观看视频后点击upload上传视频的时候进行拦截
