@@ -31,6 +31,31 @@ Page({
       videoInfo: videoInfo,
     })
 
+    var serverUrl = app.serverUrl;
+    var user = app.getGlobalUserInfo();
+    var loginUserId = "";
+    if (user != null && user != undefined && user != '') {
+      loginUserId = user.id;
+    }
+    wx.request({
+      url: serverUrl + '/user/queryPublisher?loginUserId=' + loginUserId + "&videoId=" + videoInfo.id + "&publishUserId=" + videoInfo.userId,
+      method: 'POST',
+      success: function(res) {
+        console.log(res.data);
+
+        var publisher = res.data.data.publisher;
+        var userLikeVideo = res.data.data.userLikeVideo;
+
+        me.setData({
+          serverUrl: serverUrl,
+          publisher: publisher,
+          userLikeVideo: userLikeVideo
+        });
+      }
+    })
+
+
+
   },
 
   onShow: function() {
