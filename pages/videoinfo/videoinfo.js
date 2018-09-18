@@ -68,14 +68,14 @@ Page({
     me.videoCtx.pause();
   },
 
-  showPublisher:function(){
+  showPublisher: function() {
     var me = this;
 
     var user = app.getGlobalUserInfo();
 
     var videoInfo = me.data.videoInfo;
-    //var realUrl = '../mine/mine#publisherId@' + videoInfo.userId;
-
+    var realUrl = '../mine/mine#publisherId@' + videoInfo.userId;
+    debugger;
     if (user == null || user == undefined || user == '') {
       wx.navigateTo({
         url: '../userLogin/login?redirectUrl=' + realUrl,
@@ -85,6 +85,7 @@ Page({
         url: '../mine/mine?publisherId=' + videoInfo.userId,
       })
     }
+
   },
 
   upload: function() {

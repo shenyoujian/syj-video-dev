@@ -5,6 +5,8 @@ const app = getApp()
 Page({
   data: {
     faceUrl: "../resource/images/noneface.png",
+    isMe: true,
+    isFollow: false,
   },
 
   logout: function() {
@@ -78,7 +80,10 @@ Page({
           filePath: tempFilePaths[0],
           name: 'file',
           header: {
-            'content-type': 'application/json' // 默认值
+            'content-type': 'application/json', // 默认值
+            //安全验证
+            'userId': userInfo.id,
+            'userToken': userInfo.userToken
           },
           success: function(res) {
             //微信说明uploadFile返回的是String而不是json，所以需要转换不然不能使用键去获取对应的值
@@ -107,7 +112,7 @@ Page({
             } else if (data.status == 502) {
               wx.showToast({
                 title: data.msg,
-                success:function(){
+                success: function() {
                   wx.redirectTo({
                     url: '../userLogin/login',
                   })
@@ -126,14 +131,31 @@ Page({
 
 
   //当加载用户页面的时候显示用户信息
-  onLoad: function() {
+  onLoad: function(params) {
     //回调函数里的当前对象已经改变，需要提前保存在变量里
     var me = this;
-    //fixme使用本地缓存修改全局变量
-    var user = app.getGlobalUserInfo();
-
     //var user = app.userInfo;
     var serverUrl = app.serverUrl;
+    //fixme使用本地缓存修改全局变量
+    var user = app.getGlobalUserInfo();
+    var userId = user.id;
+    //从视频页传递过来
+    var publisherId = params.publisherId;
+    debugger;
+    //如果有发布者id就设置发布者id
+    if (publisherId != null && publisherId != '' && publisherId != undefined &&
+      publisherId != userId) {
+      userId = publisherId;
+      me.setData({
+        isMe: false,
+        publisherId: publisherId,
+        serverUrl: app.serverUrl
+      })
+    }
+    //否则设置用户id
+    me.setData({
+      userId: userId
+    })
 
     wx.showLoading({
       title: '请等待...',
@@ -141,7 +163,7 @@ Page({
 
     //请求query并且把user的id发送给服务端
     wx.request({
-      url: serverUrl + '/user/query?userId=' + user.id,
+      url: serverUrl + '/user/query?userId=' + userId + '&fanId=' + user.id,
       method: 'POST',
       header: {
         'content-type': 'application/json', // 默认值
@@ -168,6 +190,7 @@ Page({
             followCounts: userInfo.followCounts,
             receiveLikeCounts: userInfo.receiveLikeCounts,
             nickname: userInfo.nickname,
+            isFollow: userInfo.follow,
           });
 
 
@@ -176,7 +199,7 @@ Page({
             title: res.data.msg,
             duration: 3000,
             icon: "none",
-            success:function(){
+            success: function() {
               wx.redirectTo({
                 url: '../userLogin/login',
               })
@@ -185,6 +208,51 @@ Page({
         }
       }
 
+    })
+  },
+
+
+  followMe: function(e) {
+    var me = this;
+
+    var user = app.getGlobalUserInfo();
+    var userId = user.id;
+    var publisherId = me.data.publisherId;
+    // 1：关注 0：取消关注
+    var followType = e.currentTarget.dataset.followtype;
+
+
+    var url = '';
+    if (followType == '1') {
+      url = '/user/beyourfans?userId=' + publisherId + '&fanId=' + userId;
+    } else {
+      url = '/user/dontbeyourfans?userId=' + publisherId + '&fanId=' + userId;
+    }
+    debugger;
+
+    wx.showLoading();
+    wx.request({
+      url: app.serverUrl + url,
+      method: 'POST',
+      header: {
+        'content-type': 'application/json', // 默认值
+        'userId': user.id,
+        'userToken': user.userToken
+      },
+      success: function() {
+        wx.hideLoading();
+        if (followType == '1') {
+          me.setData({
+            isFollow: true,
+            fansCounts: ++me.data.fansCounts
+          })
+        } else {
+          me.setData({
+            isFollow: false,
+            fansCounts: --me.data.fansCounts
+          })
+        }
+      }
     })
   },
 
