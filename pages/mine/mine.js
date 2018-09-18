@@ -7,9 +7,15 @@ Page({
     faceUrl: "../resource/images/noneface.png",
     isMe: true,
     isFollow: false,
+
+    //作品收藏关注的样式
+    videoSelClass: "video-info",
+    isSelectedWork: "video-info-selected",
+    isSelectedLike: "",
+    isSelectedFollow: "",
   },
 
-  logout: function() {
+  logout: function () {
     //首先获取全局的userinfo和服务端地址
     //var user = app.userInfo;
     //fixme使用本地缓存替换全局变量
@@ -27,7 +33,7 @@ Page({
       },
 
       //请求成功后，调用回调函数，res是服务端返回的数据
-      success: function(res) {
+      success: function (res) {
         wx.hideLoading();
         console.log(res.data);
         var status = res.data.status;
@@ -52,7 +58,7 @@ Page({
 
 
   //上传图片
-  changeFace: function() {
+  changeFace: function () {
 
     //在回调函数中不能使用this当前对象去获取初始化数据，因为在success回调函数当前对象中已经改变，这里先保存到一个变量中以供回调函数使用
     var me = this;
@@ -64,7 +70,7 @@ Page({
       count: 1, // 默认9
       sizeType: ['compressed'], // 指定压缩图
       sourceType: ['album'], // 指定从相册获取
-      success: function(res) {
+      success: function (res) {
         // 返回选定照片的本地文件路径列表，tempFilePath可以作为img标签的src属性显示图片
         var tempFilePaths = res.tempFilePaths
         console.log(tempFilePaths);
@@ -85,7 +91,7 @@ Page({
             'userId': userInfo.id,
             'userToken': userInfo.userToken
           },
-          success: function(res) {
+          success: function (res) {
             //微信说明uploadFile返回的是String而不是json，所以需要转换不然不能使用键去获取对应的值
             //现在下面可以不使用res
             //var data = res.data;
@@ -112,7 +118,7 @@ Page({
             } else if (data.status == 502) {
               wx.showToast({
                 title: data.msg,
-                success: function() {
+                success: function () {
                   wx.redirectTo({
                     url: '../userLogin/login',
                   })
@@ -131,7 +137,7 @@ Page({
 
 
   //当加载用户页面的时候显示用户信息
-  onLoad: function(params) {
+  onLoad: function (params) {
     //回调函数里的当前对象已经改变，需要提前保存在变量里
     var me = this;
     //var user = app.userInfo;
@@ -173,7 +179,7 @@ Page({
       },
 
       //请求成功后，调用回调函数，res是服务端返回的数据
-      success: function(res) {
+      success: function (res) {
         wx.hideLoading();
         console.log(res.data);
         var status = res.data.status;
@@ -199,7 +205,7 @@ Page({
             title: res.data.msg,
             duration: 3000,
             icon: "none",
-            success: function() {
+            success: function () {
               wx.redirectTo({
                 url: '../userLogin/login',
               })
@@ -212,7 +218,7 @@ Page({
   },
 
 
-  followMe: function(e) {
+  followMe: function (e) {
     var me = this;
 
     var user = app.getGlobalUserInfo();
@@ -239,7 +245,7 @@ Page({
         'userId': user.id,
         'userToken': user.userToken
       },
-      success: function() {
+      success: function () {
         wx.hideLoading();
         if (followType == '1') {
           me.setData({
@@ -258,7 +264,7 @@ Page({
 
 
   //上传视频，先上传到微信的临时路径
-  uploadVideo: function() {
+  uploadVideo: function () {
     videoUtil.uploadVideo();
     // var me = this;
     // wx.chooseVideo({
@@ -298,5 +304,33 @@ Page({
     //     }
     //   }
     // })
+  },
+
+
+  doSelectWork: function () {
+    var me = this;
+    me.setData({
+      isSelectedWork: "video-info-selected",
+      isSelectedLike: "",
+      isSelectedFollow: "",
+    }) 
+  },
+
+  doSelectLike: function () {
+    var me = this;
+    me.setData({
+      isSelectedWork: "",
+      isSelectedLike: "video-info-selected",
+      isSelectedFollow: "",
+    })
+  },
+
+  doSelectFollow: function () {
+    var me = this;
+    me.setData({
+      isSelectedWork: "",
+      isSelectedLike: "",
+      isSelectedFollow: "video-info-selected",
+    })
   },
 })
