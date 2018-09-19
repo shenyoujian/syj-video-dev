@@ -11,7 +11,7 @@ Page({
     userLikeVideo: false,
   },
   videoCtx: {},
-  onLoad: function(params) {
+  onLoad: function (params) {
     var me = this;
     me.videoCtx = wx.createVideoContext("myVideo", this);
     //获取上一个页面传入的参数，并且把字符串解析成json对象,因为需要
@@ -40,7 +40,7 @@ Page({
     wx.request({
       url: serverUrl + '/user/queryPublisher?loginUserId=' + loginUserId + "&videoId=" + videoInfo.id + "&publishUserId=" + videoInfo.userId,
       method: 'POST',
-      success: function(res) {
+      success: function (res) {
         console.log(res.data);
 
         var publisher = res.data.data.publisher;
@@ -58,17 +58,17 @@ Page({
 
   },
 
-  onShow: function() {
+  onShow: function () {
     var me = this;
     me.videoCtx.play();
   },
 
-  onHide: function() {
+  onHide: function () {
     var me = this;
     me.videoCtx.pause();
   },
 
-  showPublisher: function() {
+  showPublisher: function () {
     var me = this;
 
     var user = app.getGlobalUserInfo();
@@ -88,7 +88,7 @@ Page({
 
   },
 
-  upload: function() {
+  upload: function () {
     var me = this;
     //页面拦截，当没登陆观看视频后点击upload上传视频的时候进行拦截
     var user = app.getGlobalUserInfo();
@@ -114,20 +114,20 @@ Page({
 
 
   //按住搜索跳转到搜索页面
-  showSearch: function() {
+  showSearch: function () {
     wx.navigateTo({
       url: '../searchVideo/searchVideo',
     })
   },
 
 
-  showIndex: function() {
+  showIndex: function () {
     wx.navigateTo({
       url: '../index/index',
     })
   },
 
-  showMine: function() {
+  showMine: function () {
 
     //页面拦截，当没登陆观看视频后点击showme要看个人信息的时候进行拦截
     var user = app.getGlobalUserInfo();
@@ -144,7 +144,7 @@ Page({
   },
 
   //点赞与取消点赞
-  likeVideoOrNot: function() {
+  likeVideoOrNot: function () {
     var me = this;
     var user = app.getGlobalUserInfo();
     debugger;
@@ -176,7 +176,7 @@ Page({
         'userId': user.id,
         'userToken': user.userToken,
       },
-      success: function(res) {
+      success: function (res) {
         wx.hideLoading();
         me.setData({
           userLikeVideo: !userLikeVideo,
@@ -186,6 +186,7 @@ Page({
 
   },
 
+  //下载和举报功能
   shareMe: function () {
     var me = this;
     var user = app.getGlobalUserInfo();
@@ -241,5 +242,69 @@ Page({
       }
     })
   },
+
+  //转发视频
+  onShareAppMessage: function (res) {
+    var me = this;
+    var videoInfo = me.data.videoInfo;
+    return {
+      title: "短视频内容分享",
+      path: "pages/videoInfo/videoInfo?videoInfo=" + videoInfo,
+    }
+  },
+
+  //跳转到留言
+  leaveComment: function () {
+    var me = this;
+    //先数据绑定当点就留言按钮就把光标定位到留言的地方
+    me.setData({
+      commentFocus: true,
+    })
+  },
+
+  //发布留言
+  saveComment: function (e) {
+    var me = this;
+    var user = app.getGlobalUserInfo();
+    var serverUrl = app.serverUrl;
+    if (user == null || user == '' || user == undefined) {
+      wx.navigateTo({
+        url: '../userLogin/login',
+      })
+    } else {
+      //视频id，评论内容，留言者id
+      var videoId = me.data.videoInfo.id;
+      var comment = e.detail.value;
+      var fromUserId = user.id;
+      if (comment == '' || comment == undefined || comment == null) {
+        wx.showToast({
+          title: '留言不能为空...',
+        })
+      } else {
+        wx.request({
+          url: serverUrl + '/video/saveComment',
+          method: 'POST',
+          header: {
+            'content-type': 'application/json', // 默认值
+            //用于验证的安全信息
+            'userId': user.id,
+            'userToken': user.userToken,
+          },
+          //后台需要的参数是对象
+          data: {
+            videoId: videoId,
+            comment: comment,
+            fromUserId: fromUserId,
+          },
+          success: function (res) {
+            console.log(res.data.msg);
+          }
+        })
+      }
+    }
+  }
+
+
+
 
 })
