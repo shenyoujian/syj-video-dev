@@ -9,6 +9,15 @@ Page({
     videoInfo: {},
 
     userLikeVideo: false,
+
+    //当前页默认
+    commentsPage:1,
+    //总页默认
+    commentsTotalPage:1,
+    commentsList:[],
+
+
+    placeholder:'说点什么....',
   },
   videoCtx: {},
   onLoad: function (params) {
@@ -51,6 +60,7 @@ Page({
           publisher: publisher,
           userLikeVideo: userLikeVideo
         });
+        me.getCommentsList(1);
       }
     })
 
@@ -267,6 +277,12 @@ Page({
     var me = this;
     var user = app.getGlobalUserInfo();
     var serverUrl = app.serverUrl;
+
+
+    //获取评论回复的fatherCommentId和toUserId
+    var fatherCommentId = e.currentTarget.dataset.replyfathercommentid;
+    var toUserId = e.currentTarget.dataset.replytouserid;
+
     if (user == null || user == '' || user == undefined) {
       wx.navigateTo({
         url: '../userLogin/login',
@@ -282,7 +298,7 @@ Page({
         })
       } else {
         wx.request({
-          url: serverUrl + '/video/saveComment',
+          url: serverUrl + '/video/saveComment?fatherCommentId=' + fatherCommentId + '&toUserId=' + toUserId,
           method: 'POST',
           header: {
             'content-type': 'application/json', // 默认值
@@ -298,11 +314,82 @@ Page({
           },
           success: function (res) {
             console.log(res.data.msg);
+            //请求成功设置为false
+            me.setData({
+              commentFocus: false,
+              contentValue:'',
+              //需要清空第一页的留言列表不然当下拉到第二页的时候
+              //它会把第一页的数据也给加上
+              commentsList:[],
+            }),
+            me.getCommentsList(1);
           }
         })
       }
     }
+  },
+
+  //获取留言列表
+  getCommentsList:function(page){
+    var me = this;
+
+    var videoId = me.data.videoInfo.id;
+
+    wx.request({
+      url: app.serverUrl + '/video/getVideoComments?videoId=' + videoId + "&page=" + page + "&pageSize=5",
+      method:'POST',
+      success:function(res){
+        console.log(res.data);
+
+        var commentList = res.data.data.rows;
+        var newCommentList = me.data.commentsList;
+        me.setData({
+          commentsList:newCommentList.concat(commentList),
+          commentsPage: page,
+          commentsTotalPage: res.data.data.total,
+        })
+      }
+    })
+
+  },
+
+  //下拉分页
+  onReachBottom:function(){
+    var me = this;
+
+    var currentPage = me.data.commentsPage;
+    var totalPage = me.data.commentsTotalPage;
+    //如果当前页等于总页
+    if(currentPage==totalPage){
+      wx.showToast({
+        title: '没有留言啦~',
+      })
+    }
+
+    var page = currentPage + 1;
+    me.getCommentsList(page);
+
+  },
+
+  //回复功能
+  replyFocus:function(e){
+    var me = this;
+    //记得后面要小写
+    var fatherCommentId = e.currentTarget.dataset.fathercommentid;
+    var toUserId = e.currentTarget.dataset.touserid;
+    var toNickname = e.currentTarget.dataset.tonickname;
+
+    me.setData({
+      placeholder:'回复' +  toNickname,
+      replyFatherCommentId: fatherCommentId,
+      replyToUserId: toUserId,
+      //设置焦点
+      commentFocus: true,
+
+    })
   }
+
+
 
 
 
